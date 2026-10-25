@@ -68,6 +68,14 @@ export const NODEMAILER_EMAIL = process.env.NODEMAILER_EMAIL;
 export const NODEMAILER_PW = process.env.NODEMAILER_PW;
 
 /**
+ * Tofu: what a visitor is told while sending is off. Mail goes out from the
+ * owner's own Gmail account, so only the owner can turn it on, and the
+ * sentence says so instead of a generic "Something went wrong".
+ */
+export const EMAIL_NOT_SET_UP =
+  "Sending by email is not set up here. The site's owner has to add NODEMAILER_EMAIL (a Gmail address) and NODEMAILER_PW (an app password for that address) to its settings, then deploy it again. Until then, download the PDF and attach it to your own email.";
+
+/**
  * I18N
  */
 /**

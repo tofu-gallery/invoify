@@ -2,9 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Services
 import {
+    isEmailConfigured,
     SendPdfRequestError,
     sendPdfToEmailService,
 } from "@/services/invoice/server/sendPdfToEmailService";
+
+// Tofu: the answer below depends on the deployment's settings, never on a build.
+export const dynamic = "force-dynamic";
+
+/**
+ * Tofu: whether sending by email is set up, so the dialog can say so before
+ * anyone types an address. It answers a yes or no, never the settings.
+ */
+export async function GET() {
+    return NextResponse.json(
+        { configured: isEmailConfigured() },
+        { headers: { "Cache-Control": "no-store" } }
+    );
+}
 
 export async function POST(req: NextRequest) {
     try {

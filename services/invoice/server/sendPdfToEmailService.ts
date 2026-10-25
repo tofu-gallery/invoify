@@ -16,7 +16,11 @@ import { fileToBuffer, isValidEmail } from "@/lib/helpers";
 import { getClientKey, rateLimit } from "@/lib/server/rateLimit";
 
 // Variables
-import { NODEMAILER_EMAIL, NODEMAILER_PW } from "@/lib/variables";
+import {
+    EMAIL_NOT_SET_UP,
+    NODEMAILER_EMAIL,
+    NODEMAILER_PW,
+} from "@/lib/variables";
 
 // Nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -28,7 +32,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Check if email credentials are configured
-const isEmailConfigured = () => {
+export const isEmailConfigured = () => {
     return !!(NODEMAILER_EMAIL && NODEMAILER_PW);
 };
 
@@ -73,9 +77,9 @@ export async function sendPdfToEmailService(
         console.error(
             "Email service not configured. Please set NODEMAILER_EMAIL and NODEMAILER_PW environment variables."
         );
-        throw new Error(
-            "Email service not configured. Please contact the administrator."
-        );
+        // Tofu: a 503 with a sentence the visitor can act on, rather than a
+        // plain Error that the route turned into "Failed to send email".
+        throw new SendPdfRequestError(EMAIL_NOT_SET_UP, 503);
     }
 
     const limit = rateLimit(

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // ShadCn
 import {
@@ -20,6 +20,11 @@ import { BaseButton } from "@/app/components";
 // Helpers
 import { isValidEmail } from "@/lib/helpers";
 
+// Variables
+// Tofu: EMAIL_NOT_SET_UP is shown instead of the form while the site has no
+// email settings.
+import { EMAIL_NOT_SET_UP, SEND_PDF_API } from "@/lib/variables";
+
 type SendPdfToEmailModalProps = {
     sendPdfToMail: (email: string) => Promise<void>;
     children: React.ReactNode;
@@ -33,7 +38,25 @@ const SendPdfToEmailModal = ({
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
+    // Tofu: null until the server has said whether sending is set up.
+    const [configured, setConfigured] = useState<boolean | null>(null);
     const errorMessage = "Please enter a valid email address";
+
+    useEffect(() => {
+        if (!open || configured !== null) return;
+        const controller = new AbortController();
+        fetch(SEND_PDF_API, { signal: controller.signal, cache: "no-store" })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((body) => {
+                if (body && typeof body.configured === "boolean") {
+                    setConfigured(body.configured);
+                }
+            })
+            // Unknown stays unknown: the form is offered, and the send itself
+            // reports what went wrong.
+            .catch(() => {});
+        return () => controller.abort();
+    }, [open, configured]);
 
     const handleSendPdf = () => {
         setLoading(true);
@@ -59,29 +82,35 @@ const SendPdfToEmailModal = ({
                 <DialogHeader>
                     <DialogTitle>Send to email</DialogTitle>
                     <DialogDescription>
-                        Please specify the email address for invoice delivery.
+                        {configured === false
+                            ? EMAIL_NOT_SET_UP
+                            : "Please specify the email address for invoice delivery."}
                     </DialogDescription>
                 </DialogHeader>
-                <Label>Email</Label>
-                <Input
-                    type="email"
-                    placeholder="Enter email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                ></Input>
+                {configured !== false && (
+                    <>
+                        <Label>Email</Label>
+                        <Input
+                            type="email"
+                            placeholder="Enter email address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        ></Input>
 
-                {!loading && error && (
-                    <small style={{ color: "red" }}>{error}</small>
+                        {!loading && error && (
+                            <small style={{ color: "red" }}>{error}</small>
+                        )}
+
+                        <BaseButton
+                            tooltipLabel="Send invoice PDF"
+                            loading={loading}
+                            loadingText="Sending email"
+                            onClick={handleSendPdf}
+                        >
+                            Send PDF
+                        </BaseButton>
+                    </>
                 )}
-
-                <BaseButton
-                    tooltipLabel="Send invoice PDF"
-                    loading={loading}
-                    loadingText="Sending email"
-                    onClick={handleSendPdf}
-                >
-                    Send PDF
-                </BaseButton>
             </DialogContent>
         </Dialog>
     );
