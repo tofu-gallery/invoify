@@ -26,10 +26,7 @@ import {
     GOOGLE_SC_VERIFICATION,
     LOCALES,
 } from "@/lib/variables";
-// Vercel Analytics
-import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
-import Script from "next/script";
 // Next Intl
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "@/i18n/messages";
@@ -157,27 +154,12 @@ export default async function LocaleLayout(props: {
                         {/* Toast component */}
                         <Toaster />
 
-                        {/* Vercel analytics */}
-                        <Analytics />
-
                         {/*
-                         * Buy Me a Coffee widget. Loaded via next/script with
-                         * lazyOnload so this third party does not block parsing
-                         * — it was previously a synchronous <script> in <head>.
+                         * Tofu: Vercel Analytics and the author's Buy Me a
+                         * Coffee widget are removed. A copy belongs to its
+                         * owner, so it reports to no one and asks its visitors
+                         * for no donations.
                          */}
-                        <Script
-                            src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
-                            strategy="lazyOnload"
-                            data-name="BMC-Widget"
-                            data-cfasync="false"
-                            data-id="aliabb"
-                            data-description="Support me on Buy me a coffee!"
-                            data-message="Thank you for using Invoify"
-                            data-color="#5F7FFF"
-                            data-position="Right"
-                            data-x_margin="18"
-                            data-y_margin="18"
-                        />
                     </Providers>
                 </NextIntlClientProvider>
             </body>
