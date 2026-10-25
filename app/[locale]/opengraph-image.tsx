@@ -2,6 +2,9 @@ import { ImageResponse } from "next/og";
 
 import { getMessages } from "@/i18n/messages";
 
+// Tofu: the card names the copy's own address (NEXT_PUBLIC_SITE_URL), not upstream's.
+import { BASE_URL } from "@/lib/variables";
+
 /**
  * Open Graph card, generated rather than committed.
  *
@@ -97,7 +100,7 @@ export default async function OpengraphImage(props: {
                         fontSize: 24,
                     }}
                 >
-                    <span>invoify.vercel.app</span>
+                    <span>{new URL(BASE_URL).host}</span>
                 </div>
             </div>
         ),
